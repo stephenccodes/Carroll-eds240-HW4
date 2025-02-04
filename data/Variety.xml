@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:ds="eml://ecoinformatics.org/dataset-2.1.1" xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packageId="doi:10.5063/F18G8J29" system="knb" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 eml.xsd">
+<!-- Person who filled in the catalog entry form:   -->
+<!-- Form filled out at Mon Feb  6 18:48:27 2017 GMT -->
+<access authSystem="knb" order="allowFirst">
+<allow>
+  <principal>uid=knbadmin,o=NCEAS,dc=ecoinformatics,dc=org</principal><permission>all</permission>
+</allow>
+<allow>
+  <principal>uid=wolkovich,o=NCEAS,dc=ecoinformatics,dc=org</principal><permission>all</permission>
+</allow>
+<allow>
+  <principal>public</principal><permission>read</permission>
+</allow>
+</access>
+<dataset><title>Variety phenology</title><creator id="5563494200437248">
+<individualName><givenName>Elizabeth</givenName><surName>Wolkovich</surName></individualName>
+<address><deliveryPoint>HU Herbaria
+22 Divinity Ave</deliveryPoint>
+<city>Cambridge</city>
+<administrativeArea>Massachusetts</administrativeArea>
+<postalCode>02138</postalCode>
+<country>United States</country>
+</address><phone phonetype="voice">6036675099</phone><electronicMailAddress>lizzie@oeb.harvard.edu</electronicMailAddress>
+
+
+</creator><metadataProvider id="7512402563291357">
+<individualName><givenName>Elizabeth</givenName><surName>Wolkovich</surName></individualName>
+<address><deliveryPoint>HU Herbaria
+22 Divinity Ave</deliveryPoint>
+<city>Cambridge</city>
+<administrativeArea>Massachusetts</administrativeArea>
+<postalCode>02138</postalCode>
+<country>United States</country>
+</address><phone phonetype="voice">6036675099</phone><electronicMailAddress>lizzie@oeb.harvard.edu</electronicMailAddress>
+
+
+</metadataProvider><pubDate>2017-02-06</pubDate>
+
+
+
+
+<abstract><para>Phenological data on winegrape varieties monitored at Robert Mondavi Institute in Davis, California. (More data will be added regularly.)</para></abstract><keywordSet><keyword>phenology</keyword><keywordThesaurus>None</keywordThesaurus></keywordSet>
+
+<intellectualRights><para>This work is licensed under the Creative Commons Attribution 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/.</para></intellectualRights>
+<distribution>
+<offline>
+<mediumName>digital </mediumName>
+</offline>
+</distribution>
+<coverage>
+<temporalCoverage><rangeOfDates><beginDate><calendarDate>2014-02-01</calendarDate></beginDate><endDate><calendarDate>2016-10-31</calendarDate></endDate></rangeOfDates></temporalCoverage>
+<geographicCoverage>
+<geographicDescription>Davis, California</geographicDescription>
+<boundingCoordinates><westBoundingCoordinate>-121.7522</westBoundingCoordinate><eastBoundingCoordinate>-121.7522</eastBoundingCoordinate><northBoundingCoordinate>38.5317</northBoundingCoordinate><southBoundingCoordinate>38.5317</southBoundingCoordinate></boundingCoordinates>
+</geographicCoverage>
+<taxonomicCoverage><taxonomicClassification><taxonRankName>Species</taxonRankName><taxonRankValue>Vitis vinifera ssp. vinifera</taxonRankValue></taxonomicClassification></taxonomicCoverage>
+</coverage><contact id="5350165649220385">
+<individualName><givenName>Elizabeth</givenName><surName>Wolkovich</surName></individualName>
+<address><deliveryPoint>HU Herbaria
+22 Divinity Ave</deliveryPoint>
+<city>Cambridge</city>
+<administrativeArea>Massachusetts</administrativeArea>
+<postalCode>02138</postalCode>
+<country>United States</country>
+</address><phone phonetype="voice">6036675099</phone><electronicMailAddress>lizzie@oeb.harvard.edu</electronicMailAddress>
+
+
+</contact><methods><methodStep><description><para>No method step description provided.</para></description></methodStep><sampling><studyExtent><description><para>Wine and table grape plants at Robert Mondavi Institute, Variety Display Block.</para></description></studyExtent><samplingDescription><para>We sampled three locations/replications per vine for phenological observations, by first randomly selecting one of the two cordons (e.g., facing north or south), then selecting three positions (arms) to monitor budburst and subsequent phenological  stages: (1) the arm closest to the trunk (Position 1 in Figure 4), (2) the arm at the very end of the cordon (Position 3 in Figure 4), and then (3) the arm that is the closest to halfway between these two. The goal was to have the three selected monitoring positions spread evenly along the entire length of the cordon. We monitored these position through the season as follows:</para><para>Budburst: For each of the three arm positions on the cordon, we selected one bud (or sprouting cane originating from one bud) for monitoring. By default, we selected the lower of the (usually two) buds present on last year’s cane and monitored untiled Eichorn-Lorenz (EL) Stage 9.</para><para>Flowering: To record percent flowering we first established the clusters we hope to monitor for flowering from the bud selected to monitor at budburst, a cane will arise bearing one or more clusters of grapes. For the remaining pheno stages (bloom, veraison, Brix), we aimed to select the basal cluster (the lower one, originating closest to the ground) on the cane arising from the lowest bud position on the flagged arm. We then visually assessed each cluster (#1, #2, #3) to visually estimate and record the percent (from 0-100%) of berries on the sample cluster that have achieved flowering. We recorded all plants until 95% or 100% bloom.</para><para>Veraison: We followed the same cluster for veraison and same visual assessment (as described above for flowering). We considered veraison as any detectable color change (e.g., a light pink berry is counted as well as a dark purple one) or softness change.</para><para>Clusters were replaced during the season for monitoring if: (a) they were removed during suckering or such or (b) they were clearly not the dominant cluster. In such cases the closest dominant cluster was then monitored.</para><para>Observations were converted to estimates of dates of a common stage for each phenophase (e.g., 50% flowering for flowering) by fitting a linear regression (trimming very low or very high repeated observations, such as 100% flowering being observed repeatedly) and predicting from it.</para><para>Note that ZDavis.data.4climatefuture.csv file represents the data used to validate phenological models in Morales-Castilla's paper on cultivar diversity.</para></samplingDescription></sampling></methods><otherEntity id="knb.1253.1" scope="document">
+            <entityName>dat.4phases.noNA.2015.csv</entityName>
+            <physical scope="document">
+                <objectName>dat.4phases.noNA.2015.csv</objectName>
+                <size>10266</size>
+                <authentication method="SHA1">e91b8b80b73a2dc85580a68e9f5b646c01f378c6</authentication>
+                <dataFormat>
+                    <externallyDefinedFormat>
+                        <formatName>text/csv</formatName>
+                    </externallyDefinedFormat>
+                </dataFormat>
+                <distribution id="e91b8b80b73a2dc85580a68e9f5b646c01f378c6002" scope="document">
+                    <online>
+                        <url function="download">ecogrid://knb/knb.1253.1</url>
+                    </online>
+                    
+                <access authSystem="knb" order="allowFirst">
+                    <allow>
+  <principal>uid=knbadmin,o=NCEAS,dc=ecoinformatics,dc=org</principal><permission>all</permission>
+</allow>
+
+                    <allow>
+  <principal>uid=wolkovich,o=NCEAS,dc=ecoinformatics,dc=org</principal><permission>all</permission>
+</allow>
+
+                    <allow>
+                        <principal>public</principal>
+                        <permission>read</permission>
+                    </allow>
+                </access>
+    
+                </distribution>
+            </physical>
+            <entityType>Other</entityType>
+    </otherEntity><otherEntity id="urn-uuid-53fcd7e6-69e5-4f13-8f1d-ace9fd3d64c5"><entityName>ZDavis_data_4climatefuture.csv</entityName><entityType>text/csv</entityType></otherEntity>
+
+
+</dataset>
+</eml:eml>

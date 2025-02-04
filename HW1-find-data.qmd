@@ -1,0 +1,59 @@
+---
+title: "Assignment #1 Find Data "
+subtitle: "Data exploration"
+author: "Stephen Carroll"
+toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(colorspace)
+library(geofacet) 
+library(ggtext) 
+library(glue) 
+library(grid)
+library(magick)
+library(patchwork) 
+library(scales) 
+library(showtext) 
+library(tidyverse)
+library(here)
+library(xml2)
+```
+
+```{r}
+# Winegrape Vine data
+
+
+# Read in vine cold-hardiness data
+# https://knb.ecoinformatics.org/view/urn%3Auuid%3Af2e1d5be-1365-4fad-aed8-17095f5e16c1
+vines <- read_csv(here('data/VineColdHardiness.csv'))
+
+# Read in Phenological data on winegrape varieties
+# https://knb.ecoinformatics.org/view/doi%3A10.5063%2FF18G8J29
+phases <- read_csv(here('data/dat_4phases_noNA_2015.csv'), show_col_types = FALSE)
+
+climate_future <- read_csv(here('data/ZDavis_data_4climatefuture.csv'),  show_col_types = FALSE)
+
+# Read the XML file
+xml_data <- read_xml("data/Variety.xml")
+
+# Display the XML content
+print(xml_data)
+
+```
+
+
+```{r}
+# Monarch Butterfly data
+# https://knb.ecoinformatics.org/view/urn%3Auuid%3A9baf61ae-e9a6-4b34-a7a1-c5aa24f0ddea
+
+# https://knb.ecoinformatics.org/view/urn%3Auuid%3A24e22597-af91-4f32-97a0-9d294d4cb0f4
+```
+```{r}
+# Organic ammendment data
+
+organic_ammendment <- read_csv(here('data/input_data_all_analyzed.csv'))
+```
+
