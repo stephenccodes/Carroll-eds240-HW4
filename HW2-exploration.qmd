@@ -1,0 +1,385 @@
+---
+title: "HW2-exploration"
+author: "Stephen Carroll"
+date: 2025-02-05
+format:
+  html:
+    embed-resources: true
+    code-fold: true
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+# Load packages
+library(colorspace)
+library(geofacet) 
+library(ggtext) 
+library(glue) 
+library(grid)
+library(magick)
+library(patchwork) 
+library(scales) 
+library(showtext) 
+library(tidyverse)
+library(here)
+library(xml2)
+library(ggplot2)
+library(dplyr)
+library(ncdf4)
+library(readxl)
+library(sf)
+library(tmap)
+library(CFtime)
+library(lattice)
+library(RColorBrewer)  
+library(raster)
+```
+
+```{r}
+# Read in vine cold-hardiness data
+vines <- read_csv(here('data/VineColdHardiness.csv'))
+```
+
+## Plot the three varieties most susceptible to cold temperatures
+
+```{r}
+# Make a subset 
+top_varieties <- vines %>%
+  
+  # Filter for the year 2016
+  filter(year == 2016) %>%
+  group_by(variety) %>%
+  
+  # Find the 3 least cold tolerant varieties
+  summarise(avg_lte = mean(lte, na.rm = TRUE)) %>%
+  top_n(3, avg_lte) %>%
+  pull(variety)
+
+# Filter the data to include only the top 3 varieties
+vines_top_varieties <- vines %>%
+  filter(year == 2016, variety %in% top_varieties)
+
+# Create a boxplot
+ggplot(vines_top_varieties, aes(x = variety, 
+                                y = lte, 
+                                color = variety)) +
+  geom_boxplot(size = 1, color = "black", fill = "lightgray") +
+  
+  # Label  the median
+  stat_summary(fun.y = median, 
+               geom = "text", 
+               aes(label = round(..y.., 1)), 
+               vjust = -0.5, 
+               size = 4, 
+               color = "black") +
+  # Add labels
+ labs(title = "Temperature Distribution for Top 3 Varieties with Highest Fatal Temperature (LTE) in 2016", 
+      x = "Grape Variety",
+      y = "Fatal Temperature (LTE in°C)") + 
+  theme_minimal()
+
+```
+
+## Plot the three varieties least susceptible to cold temperatures
+
+```{r}
+# Make a subset 
+bottom_varieties <- vines %>%
+  
+  # Filter for the year 2016
+  filter(year == 2016) %>%
+  group_by(variety) %>%
+  
+  # Find the 3 most cold-tolerant varieties
+  summarise(avg_lte = mean(lte, na.rm = TRUE)) %>%
+  top_n(-3, avg_lte) %>%  # Use -3 to get the bottom 3 values (least cold-tolerant)
+  pull(variety)
+
+# Filter the data to include only the bottom 3 varieties
+vines_bottom_varieties <- vines %>%
+  filter(year == 2016, variety %in% bottom_varieties)
+
+# Create a boxplot
+ggplot(vines_bottom_varieties, aes(x = variety, 
+                                  y = lte, 
+                                  color = variety)) +
+  geom_boxplot(size = 1, color = "black", fill = "lightgray") +
+  
+  # Label the median
+  stat_summary(fun.y = median, 
+               geom = "text", 
+               aes(label = round(..y.., 1)), 
+               vjust = -0.5, 
+               size = 4, 
+               color = "black") +
+  # Add labels
+  labs(title = "Temperature Distribution for Bottom 3 Varieties with Lowest Fatal Temperature (LTE) in 2016", 
+       x = "Grape Variety",
+       y = "Fatal Temperature (LTE in°C)") + 
+  theme_minimal()
+```
+
+## Make a heatmap showing the fatality tmeperature (LTE) for different varieties each year
+
+```{r}
+vines <- vines %>%
+  
+  # Group by variety
+  group_by(variety) %>%
+  
+  # Remove varieties with less than 3 years of data
+  filter(n_distinct(year) >= 5) %>%
+  
+  # Calculate the average LTE for each variety
+  #mutate(lte_adjust = mean(lte, na.rm = TRUE)) %>%
+  ungroup()
+
+ggplot(vines, aes(x = variety,
+           y = as.factor(year),
+           fill = lte)) +
+  geom_tile() +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  labs(title = "Heatmap of Average LTE for Variety",
+       x = "Grape Variety",
+       y = "Year",
+       fill = "Avg LTE (°C)") +
+  theme_minimal() +
+  coord_flip()
+```
+
+## Plot average fatal temperatures of differnt varietals
+
+```{r}
+average_lte <- vines %>%
+  group_by(variety) %>%
+  summarise(avg_lte = mean(lte, na.rm = TRUE))
+
+ggplot(average_lte, aes(x = variety, y = avg_lte, fill = variety)) +
+  geom_point(stat = "identity", show.legend = FALSE) +  
+  labs(title = "Average Fatal Temperature (lte) Across Grape Varieties",
+       x = "Grape Variety",
+       y = "Average Fatal Temperature (°C)") +
+  theme_minimal() +
+  coord_flip()
+```
+
+
+## 2c.
+
+1.  What have you learned about your data? Have any potentially interesting patterns emerged?
+
+**I have been able to determine general trends of cold-hardiness among several varieties of grapes, but the data for heat tolerance is proving harder to interpret than I had initially thought. Similarly, the NC files are still unaccessed. I plan to attend office hours next week to get insight on these issues. The economic data on California is easy to interpret, and if I can access the climate change data and regional temperature data in the NC files, I should be able to identify regions that are susceptible to changes in temperature ranges, and thereby predict which varietals will be harder to grow in the future.**
+
+2.  In HW #1, you outlined some questions that you wanted to answer using these data. Have you made any strides towards answering those questions? If yes, how so? If no, what next steps do you need to take (e.g. I need to create X plot type, I still need to track down Y data, I need to restructure existing data so that you can visualize it in Z ways, etc.)?
+
+*Some potential questions I would like to use these data to explore are:*
+
+*What varieties of wine grapes are more susceptible to temperature anomalies brought on by climate change?*
+
+**This question is very answerable. I still need to find a way to interpret the heat tolerance data, but the cold-hardiness data has already allowed me to identify some varietals that are more susceptible to cold temperatures.**
+
+*What viticultural regions are more susceptible to economic and varietal impacts driven by climate change?*
+
+**This question is predicated on the previous one. The data for California at least is very accessible. Depending on the varietals that I determine to be susceptible to heat, I can focus on this region or another. The climate change, regional temperature, and economic data I found had options to download data for other areas. It is possible that the conclusions I make answering the first questions won't be strong enough to make a confident claim answering this one.**
+
+*What is the relationship between vine cold-hardiness, heat tolerance, and wine quality across different grape varieties?*
+
+**The French wine vintage rating data that I found is more simple than I realized. It generalizes each year to only two regions in France, and only classifies the wine as red or white. Realistically, I think it would be difficult to make any sort of claim about varietal hardiness and it's relationship to wine quality. I'm going to keep considering the data for now, perhaps there will be a relationship between climate or even microflora that is revealed if/when I am able to access that data.**
+
+*How do fungal and yeast communities in wine ecosystems vary by region and grape variety in France?*
+
+**I still haven't gained access to this data. I did hear back from DataONE initially, but haven't gotten any updates about access. Without these two datasets I won't be able to answer this question at all.**
+
+*What are the spatial patterns of wine grape variety distribution across wine regions, and how might these patterns change with future climate projections?*
+
+**This question is still very much on the table. The economic data I found is dense, detailed, and varied. I have barely scratched the surface of all the different subsets included in it. There is something like three dozen sheets in the excel file. There is a sheet that specifies the acreage of grapes grown by variety and county, so I do think that if I get a good grasp of the varietals of grapes that are going to be harder to grow given a rise/fall of temperatures, and the forecasted change in temperature, that I should be able to make some quality predictions about this.**
+
+------------------------------------------------------------------------
+
+3.  What challenges do you foresee encountering with your data? These can be data wrangling and / or visualization challenges.
+
+**I think that my data access issues will probably get resolved. The half dozen or so R scripts for the phenology/heat tolerance data is a bit confounding, but I think that I will eventually figure it out with some help. Same with the climate change and regional temperature data in NC format. I am less confident about the fungi and yeast data, but I am not planning on having it so I am not concerned.**
+
+**There is a lot of potential for cool visualizations of wine growing regions, the varietals that are prevalent in them, and their risk of climate change upsetting the status quo. I am a bit concerned about being able to make *new* conclusions, everywhere I look I am seeing that questions I want to investigate have been answered (see Merlot plot below). I'm not sure I'm the best person to be making economic projections based on climate data. I'm going to keep an open mid about introducing another angle of analysis to my project as I work, as I still don't feel like there is one singular question that is itching to be answered.**
+
+### Other exploration below:
+
+
+```{r}
+# Read in Phenological data on winegrape varieties
+phases <- read_csv(here('data/dat_4phases_noNA_2015.csv'), show_col_types = FALSE)
+
+climate_future <- read_csv(here('data/ZDavis_data_4climatefuture.csv'),  show_col_types = FALSE)
+```
+
+## Phenological stages by variety
+```{r}
+ggplot(phases, aes(x = variety, y = doy.2015, color = event)) +
+  geom_point() +
+  labs(x = "Variety",
+       y = "Day of Year (2015)") +
+  coord_flip()
+```
+
+
+## California Wine Grape economic data
+
+```{r}
+ca_wine <- read_excel(here('data/california_without_raisin_and_table_grapes.xlsx'), sheet = "Area by V (ha)")
+```
+
+```{r}
+# Remove prefix 'area' from column names
+colnames(ca_wine) <- gsub("^area", "", colnames(ca_wine))
+
+# Make the df long and add a year column
+ca_wine_long <- ca_wine %>%
+  pivot_longer(cols = -variety, # Select all columns except variety
+               names_to = "year",  # Add year column
+               values_to = "area_ha") %>%  # New column for the values
+  mutate(year = as.factor(year)) %>%  # Make year numeric
+  filter(!is.na(area_ha)) # Filter out NA values
+```
+
+```{r}
+# Make a categorical color palette
+my_palette <- c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a')
+
+# Find the top 10 varieties by the total value
+top_varieties <- ca_wine_long %>%
+  group_by(variety) %>%
+  
+  # Remove grouped values
+  filter(!variety %in% c("other red", "other white")) %>% 
+  summarise(total_area_ha = mean(area_ha)) %>%
+ slice_max(total_area_ha, n = 6) %>% # Pull top 6
+  pull(variety) # List names as a vector
+
+
+# Create a new column for color based on whether 
+# the variety is in the top 10 or not
+ca_wine_long <- ca_wine_long %>%
+  mutate(line_color = ifelse(variety %in% top_varieties, variety, "Other"))
+
+# Create a line plot with grayed-out lines and colored top 10 varieties
+ggplot(ca_wine_long, aes(x = year, 
+                         y = area_ha, 
+                         group = variety)) +
+  
+  geom_line(aes(color = line_color), size = 1.2) + 
+  
+  # Color the lines based on the list we made
+  scale_color_manual(values = c(setNames(my_palette,top_varieties), # Assign the colors
+                                "Others" = "gray")) + 
+  theme_minimal() +
+  labs(title = "Prevalence of Different California Wine Grape Varietals Over Time", 
+       x = "Year", 
+       y = "Area (ha)") +
+  
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(title = "Variety"))
+
+```
+
+### Cheeky plot about cultural impacts of media:
+
+I thought this effect was anecdotal, only to realize that it is very well [studied](https://arefiles.ucdavis.edu/uploads/pub/2022/08/04/2021_consoli_et_al_jwe_sideways_supply_response.pdf) and has been widely [visualized.](https://x.com/_cingraham/status/1485668480300961792)
+
+```{r}
+# Filter the data for Merlot
+ca_wine_long %>% 
+  filter(variety == "Merlot") %>% 
+
+# Create the plot for Merlot
+  ggplot(aes(x = year, y = area_ha, group = variety)) +
+    geom_line() +
+    geom_vline(xintercept = "2004", linetype = "dashed", color = "red", size = 1) +  # Vertical dashed line
+    geom_text(aes(x = "2008", y = 15000, label = "'Sideways' released in theaters\n October, 2004"), 
+              vjust = -0.5, color = "black", size = 3) +  # Annotation near the line
+    scale_x_discrete(breaks = as.character(seq(1994, 2022, by = 4))) + # Ticks every 5 years
+
+    theme_minimal() +
+    labs(title = "Tracking the 'Sideways effect' on California Merlot Production", x = "Year", y = "Area (ha)")
+
+```
+
+## Phenology of wine grapes
+
+```{r}
+# Budburst and leafout phenology of winegrapes
+
+leafout <- read_csv(here('data/data/leafout_est_2015.csv'))
+
+# phenmoist <- read_csv(here('data/data/phenmoist_grapes2016.csv'))
+
+# chambanalysis <- read_csv(here('data/data/chamberobservations_grapes2016.csv'))
+
+# Vitis <- read_csv(here('data/data/VitisExpReps2.csv'))
+
+budburst <- read_csv(here('data/data/budburst_est_2015.csv'))
+
+# baseline <- read_csv(here('data/data/baselinespursize.csv'))
+```
+
+## Wine Regions
+
+```{r}
+# Read in the wine region shp
+path <- "data/wine_regions/WinegrowingRegionsoftheWorld.shp"  #
+wine_regions <- st_read(path)
+
+wine_regions <- st_make_valid(wine_regions) %>% 
+  na.omit()
+
+#tmap_options(check.and.fix = TRUE)
+
+tm_shape(wine_regions, bbox = 'California') +
+  tm_polygons()
+```
+
+## French wine vintage ratings
+
+```{r}
+# French wine vintage ratings
+
+vintage_ratings <- read_csv(here('data/burgbord.csv'))
+
+```
+
+## Climate data
+
+```{r}
+# set path and filename
+ncpath <- 'data/badc/ar6_wg1/data/spm/spm_05/v20221116/v20221116/'
+ncname <- "Figure_SPM5_d1_cmip6_SM_tot_change_at_1_5C"
+ncfname <- paste(ncpath, ncname, ".nc", sep="")
+dname <- "tmp"  # note: tmp means temperature (not temporary)
+```
+
+```{r}
+# Open the NetCDF file
+nc_file <- nc_open("your_data.nc", return_on_error = TRUE)
+
+ncin <- nc_open(ncfname)
+
+print(ncin)
+
+nc_close(ncin)
+
+```
+
+```{r}
+# temperature <- ncvar_get(ncin, "mrso")
+```
+
+## Regional Temperature data
+
+```{r}
+# # https://berkeleyearth.org/data/
+# 
+# fp1 <- here('data/North_America_TAVG_Gridded_1.nc')
+# 
+# warming <- nc_open('fp1')
+```

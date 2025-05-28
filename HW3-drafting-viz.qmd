@@ -1,0 +1,260 @@
+---
+title: "HW3-exploration"
+author: "Stephen Carroll"
+date: 2025-02-25
+format:
+  html:
+    embed-resources: true
+    code-fold: true
+execute:
+  warning: false
+  message: false
+---
+
+## Background questions
+
+  1. Which option do you plan to pursue? It’s okay if this has changed since HW #1.
+  
+  **I will be completing an infographic to satisfy option 1.**
+  
+  2. Restate your question(s). Has this changed at all since HW #1? If yes, how so?
+  
+  **How will climate change impact viticulture in British Columbia?**
+  
+      - What is the trend of budbreak date in recent years?
+      - What is the average budbreak date for different varieties?
+      - What are the different varietals that are the most popular?
+      - What varieties of wine grapes are more susceptible to temperature anomalies brought on by climate change? Are they the popular ones?
+  
+  3. Explain which variables from your data set(s) you will use to answer your question(s), and how.
+  
+  **The primary variable that will be highlighted in my visualization is the `doy`, indicating the average day of the year that budbreak is observed. Budbreak is the phenological phase where the vine exits dormancy, defined as the the stage when 50% of bud nodes show new, green growth, marking the start of vine growth and photosynthesis. This main variable will be examined in the context of other variables like `year`, `variety`, `event` and  `varietal_revenue`.**
+  
+  4. Find at least two data visualizations that you could (potentially) borrow / adapt pieces from. Link to them or download and embed them into your .qmd file, and explain which elements you might borrow (e.g. the graphic form, legend design, layout, etc.).
+  
+  [World Cup Heatmap](images/fifa-world-cup.png)
+  
+ - I really enjoy how this heatmap from [Tanya Shapiro](https://tanyaviz.com/) conveys both categorical and temporal data, while using color and shape to highlight significant cells. I will try to make something similar showing variety instead of country, and highlighting vintages where the annual `revenue_pcnt` is high or changes wuth color.
+  
+  [Future Winegrape Phenology in the Okanagan Valley]('https://stateofwine.org/wp-content/uploads/2023/05/FI18-Future-Predictions-Flowering-Winegrape-Phenology-in-the-Okanagan-Vall.y-2023.pdf')
+  
+ -  To display `doy` for different varieties of grapes, 
+  
+  [Flowering GDD trends over time]('https://stateofwine.org/wp-content/uploads/2022/10/FloweringGDD.pdf')
+  
+ - The chart on the second page of this document titles 'Variations in GDD across varieties' has a general layout that could be adapted to show the differing  budbreak over time for different varieties. Theirs is a bit busy, and I would probably favor a more simple dot or lollipop plot instead.
+  
+  [Winegrape Phenology in the Okanagan Valley]('https://stateofwine.org/wp-content/uploads/2021/11/Flowering.pdf')
+  
+ - For a general overview of what my infographic layout could resemble, though this factsheet is heavier on the information and less so on the visual elements.
+
+  [SAINT-ÉMILION • POMEROL and their satellite appellations]('https://www-iuem.univ-brest.fr/wapps/letg/adviclim/BDX/EN/#')  
+  
+ - General inspiration for wine-centric data viz layout and style.
+
+  
+5. Hand-draw your anticipated visualizations
+  
+ ![Sketch of infographic](images\sketch.jpg)
+
+  
+  6. Mock up all of your hand drawn visualizations using code. We understand that you will continue to iterate on these into HW #4 (particularly after receiving feedback), but by the end of HW #3, you should:
+  
+  - ### See below
+  
+  
+  7. Answer the following questions:
+
+
+    a. What challenges did you encounter or anticipate encountering as you continue to build / iterate on your visualizations in R? If you struggled with mocking up any of your three visualizations (from #6, above), describe those challenges here.
+    
+    I had planned to make a lollipop plot to show the differing days of year for the budburst phenological event, but later decided it would be more complelling to show all four events for each variety and compare those. My initial vision for a heatmap didn't work out as planned because there was enough missing data to make it irrelevant/useless. i wasn't able to factor and sort the varieties to make it neater, but the final version will. The dataset I had found with the variables I was interested in exploring ended up having values(varieties) that were not well known or relevant to the audience. I had to make do with another dataset but it has caused me to re-evaluate my narrative, and I'll need to continue adapting the overall message or story I am looking to convey. I'm still interested in using historic temperature data to compare to phenologic events and how they've chnaged over time, but this comparison is made difficult due to microclimates in the area of study. I experimented with violin plots, ridghe plots, and box plots to show the Lethal Temperature data, but ultimately decided the best way to show this data was to sumamrize it and use another dot plot. Not happy aout that!
+    
+    
+    b. What ggplot extension tools / packages do you need to use to build your visualizations? Are there any that we haven’t covered in class that you’ll be learning how to use for your visualizations?
+    I spent too long exploring other packages on data-to-viz.com but ultimately have decided to move forward with two dot plots and a heatmap. The violin plots didn't do a great job of differentiating between years, and the boxplots just seem too 'sciencey' for this project. I think the ridge line plot could have worked, but I had a hard time getting the aesthetics close to what I was looking for originally(something resembling rows of trellissed vines) and bailed on that idea. The packages I've needed are all pretty standard. I ahven't nailed down a color palette yet so it's possible I'll use something exotic for that.
+    
+    c. What feedback do you need from the instructional team and / or your peers to ensure that your intended message is clear?
+    I'm just looking to hear if I'm on track or not. Should I change the Cold Temp plot to another kind of plot? I don't know why I have a mental block with this project but my optoin paralysis has been a bit of a nightmare for any creative decisions, which would then get undercut by practical limitations, rinse and repeat.
+
+
+## Data Visualizations
+
+### Packages
+
+```{r}
+library(tidyverse)     
+library(here)   
+library(ggplot2)      
+library(dplyr)     
+library(viridis)    
+library(showtext)
+library(openxlsx)
+```
+
+### Data Load-In
+
+```{r}
+#| warning: false
+#| echo: true
+
+# Read in budburst data
+budburst <- read_csv(here('data/data/budburst_est_2015.csv'))
+
+# Read in vine cold-hardiness data
+vines_cold <- read_csv(here('data/VineColdHardiness.csv'))
+
+# Read in grape production data
+# **Will change to revenue % for better representation of popularity**
+ca_wine <- read.xlsx(here('data/california_without_raisin_and_table_grapes.xlsx'), sheet = "Area by V (ha)")
+
+# Read in projected bb data
+climate_future <- read_csv(here('data/ZDavis_data_4climatefuture.csv'),  show_col_types = FALSE)
+
+# Read in projected bb data
+phases <- read_csv(here('data/dat_4phases_noNA_2015.csv'), show_col_types = FALSE)
+
+leafout <- read_csv(here('data/data/leafout_est_2015.csv'))
+```
+
+### Data cleaning
+
+```{r}
+#| echo: true
+#| warning: false
+
+# Clean production data
+colnames(ca_wine) <- gsub("^area", "", colnames(ca_wine))
+
+ca_wine_long <- ca_wine %>%
+  pivot_longer(cols = -variety, names_to = "year", values_to = "area_ha") %>%
+  mutate(year = as.integer(year)) %>%
+  filter(!is.na(area_ha), year >= 2000) %>%
+  mutate(area_rank = factor(dense_rank(desc(area_ha))))
+
+#### Go back and use janitor and possibly combine different datasets into one main set
+```
+
+### Heatmap
+
+```{r}
+#| warning: false
+
+# Set font
+font_add_google(name = "Cormorant Garamond", family = "cormorant")
+showtext_auto()
+
+# Heatmap of variety popularity (vineyard area) by year
+ggplot(ca_wine_long, aes(x = factor(year), y = variety, fill = area_ha)) +
+  geom_tile(color = "white", width = 0.9, height = 0.9) +
+  scale_fill_viridis_c(option = "viridis", name = "Area (ha)") +
+  coord_equal() +
+  labs(
+    title = "Vineyard Area by Variety and Year",
+    x = "Year",
+    y = "Variety") +
+  
+  theme_minimal(base_size = 12,
+                base_family = "cormorant") +
+  theme(plot.title = element_text(face = "bold", 
+                                  size = 14, 
+                                  hjust = 0.5, 
+                                  margin = margin(b = 8)),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    axis.text.y = element_text(size = 8),
+    panel.grid = element_blank(),
+    axis.ticks = element_blank())
+
+```
+
+
+-----------------------------
+
+### Phenological Events Plot
+
+```{r}
+#| warning: false
+
+# make a vector of 5 varieties
+popular_varietals <- phases %>%
+  distinct(variety) %>%
+  slice_sample(n = 5) %>%
+  pull(variety)
+
+# Make a basic dot plot 
+ggplot(
+  phases %>% 
+    filter(variety %in% popular_varietals),
+  aes(x = variety, y = doy.2015, color = event)) +
+  
+  geom_point(size = 3) +
+  scale_color_discrete(
+    labels = c(bb = "bud burst",
+               brix22 = "ripen",
+               flo  = "flowering",
+               ver = "verasion")) +
+  labs(title = "Phenological Events for 5 British Columbia Varieties (2015)",
+       x = "Variety",
+       y = "Day of Year") +
+  
+  coord_flip() +
+  
+  theme_minimal(base_family = "cormorant") +
+  
+  theme(plot.title = element_text(face = "bold", 
+                                  size = 14, 
+                                  hjust = 0.5),
+    axis.text.y = element_text(size = 10),
+    axis.text.x = element_text(size = 10))
+
+```
+
+
+### Lethal Cold Temperature (LTE) Plot
+
+```{r}
+#| warning: false
+#| message: false
+
+# calculate the mean lte for each variety in each year
+mean_lte_summary <- vines_cold %>%
+  group_by(variety, year) %>%
+  summarise(mean_lte = mean(lte, na.rm = TRUE), .groups = "drop")
+
+top_reds <- c("Merlot", "Pinot noir", "Cabernet Sauvignon", "Cabernet Franc", "Shiraz")
+
+top_whites <- c("Pinot gris", "Chardonnay", "Riesling", "Gewurztraminer", "Sauvignon blanc")
+
+mean_lte_summary %>% 
+  filter(variety %in% top_reds) %>%
+  mutate(year = factor(year)) %>%  
+  ggplot(aes(x = mean_lte, y = variety, color = year)) +
+  geom_point(alpha = 0.7,
+             position = position_dodge(width = 0.1),) +
+  
+  labs(title = "Mean Lethal Temperature by Red Variety",
+       x = "Lethal Temperature (°C)",
+       y = "Variety",
+       color = "Year") +
+  
+  theme_minimal(base_family = "cormorant")
+
+mean_lte_summary %>% 
+  filter(variety %in% top_whites) %>%
+  mutate(year = factor(year)) %>%  
+  ggplot(aes(x = mean_lte, y = variety, color = year)) +
+  geom_point(alpha = 0.7,
+             position = position_dodge(width = 0.1),) +
+  labs(
+    title = "Mean Lethal Temperature by White Variety",
+    x = "Lethal Temperature (°C)",
+    y = "Variety",
+    color = "Year") +
+  theme_minimal(base_family = "cormorant")
+
+```
+
+
+
+
+
